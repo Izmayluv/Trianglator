@@ -1,0 +1,15 @@
+private suspend fun getNotifications(): List<Notification> = withContext(Dispatchers.IO) {
+    val notificationsCollection = firestore.collection("Notifications")
+    val notificationsSnapshot = notificationsCollection.get().await()
+
+    val notificationsList = mutableListOf<Notification>()
+    for (document in notificationsSnapshot) {
+        val title = document.getString("title") ?: ""
+        val message = document.getString("message") ?: ""
+        val timestampMillis = document.getLong("timestamp") ?: 0
+        val timestamp = Date(timestampMillis)
+        val notification = Notification(title, message, timestamp)
+        notificationsList.add(notification)
+    }
+    notificationsList
+}
